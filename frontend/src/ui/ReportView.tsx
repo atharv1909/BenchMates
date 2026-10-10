@@ -51,6 +51,7 @@ export function ReportView() {
     : (report?.sources?.[0]?.url
       ? report.sources[0].url.replace(/^file:\/\/\/?/, '').replace(/\/[^/]+$/, '').replace(/\//g, '\\')
       : 'D:\\GravityDesk\\output\\ProjectOutput');
+  const projectName = localOutputDir.split(/[\\/]/).filter(Boolean).pop() || 'ProjectOutput';
 
   const [realFiles, setRealFiles] = useState<Record<string, string> | null>(null);
 

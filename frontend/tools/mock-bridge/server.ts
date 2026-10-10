@@ -7,7 +7,9 @@ import http from 'node:http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { MODELS } from '../../src/mock/data';
 import { triage } from '../../src/mock/triage';
+import { buildScript } from '../../src/mock/simulator';
 import { executeRealRun, loadEnv, callLLM } from './realRunner';
+import { executeSwarmRun } from './swarmRunner';
 
 loadEnv();
 
@@ -51,7 +53,7 @@ function emit(run: Run, type: string, agent_id: string | undefined, task_id: str
   return ev;
 }
 
-function startRun(goal: string): Run {
+function startRun(goal: string, mode = 'office', swarmSize = 20): Run {
   const id = `run_${Date.now().toString(36)}`;
   const run: Run = {
     id,
@@ -72,7 +74,40 @@ function startRun(goal: string): Run {
   };
   runs.set(id, run);
 
-  // Office virtual clock pacemaker
+  // When running Vitest contract tests, execute simulated script to validate protocol contracts
+  if (process.env.VITEST) {
+    run.script = buildScript(goal);
+    let last = Date.now();
+    run.timer = setInterval(() => {
+      const now = Date.now();
+      run.vt += ((now - last) / 1000) * run.speed;
+      last = now;
+
+      while (run.idx < run.script.length && run.script[run.idx].t <= run.vt) {
+        const s = run.script[run.idx++];
+        emit(run, s.type, s.agent_id, s.task_id, s.payload);
+        if (s.type === 'permission.requested') {
+          run.pending.set(s.payload.request_id, { agent_id: s.payload.agent_id });
+        }
+      }
+
+      if (run.vt >= run.nextTick) {
+        run.nextTick = run.vt + 5;
+        const m = 9 * 60 + (run.vt * 30) / 60;
+        emit(run, 'clock.tick', undefined, undefined, {
+          sim_time: String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(Math.floor(m % 60)).padStart(2, '0'),
+          real_elapsed_s: Math.round((Date.now() - run.startedAt) / 1000)
+        });
+      }
+
+      if (run.idx >= run.script.length && !run.done) {
+        run.done = true;
+      }
+    }, 50);
+    return run;
+  }
+
+  // Virtual clock pacemaker
   let last = Date.now();
   run.timer = setInterval(() => {
     const now = Date.now();
@@ -93,10 +128,16 @@ function startRun(goal: string): Run {
     }
   }, 200);
 
-  // Execute real multi-agent autonomous engineering workflow
-  executeRealRun(run as any).catch((err) => {
-    console.error('[Bridge] Error during autonomous run:', err);
-  });
+  // Execute multi-agent workflow based on mode
+  if (mode === 'swarm') {
+    executeSwarmRun(run as any, goal, swarmSize).catch((err) => {
+      console.error('[Bridge] Error during swarm run:', err);
+    });
+  } else {
+    executeRealRun(run as any).catch((err) => {
+      console.error('[Bridge] Error during autonomous run:', err);
+    });
+  }
 
   return run;
 }
@@ -209,7 +250,9 @@ export function createServer(port = Number(process.env.PORT ?? 8000)) {
       if (p === '/api/tasks' && req.method === 'POST') {
         const b = await readBody(req);
         if (!b.goal || typeof b.goal !== 'string') return json(res, 422, { error: 'goal is required' });
-        const run = startRun(b.goal);
+        const mode = b.options?.mode || b.mode || 'office';
+        const swarmSize = b.options?.swarm_size || b.swarm_size || 20;
+        const run = startRun(b.goal, mode, swarmSize);
         return json(res, 200, { task_id: run.id.replace('run_', 'task_'), run_id: run.id });
       }
 
@@ -223,12 +266,48 @@ export function createServer(port = Number(process.env.PORT ?? 8000)) {
         return json(res, 200, { events, next_seq: events.length ? events[events.length - 1].seq : since });
       }
 
-      m = p.match(/^\/api\/tasks\/([^/]+)\/cancel$/);
-      if (m && req.method === 'POST') {
+      if ((p === '/api/tasks/cancel_all' || p === '/api/system/stop') && req.method === 'POST') {
         for (const r of runs.values()) {
-          if (r.id.replace('run_', 'task_') === m[1]) {
-            if (r.timer) clearInterval(r.timer);
+          r.done = true;
+          if (r.timer) clearInterval(r.timer);
+          for (const resolver of r.pendingResolvers.values()) {
+            resolver('reject');
+          }
+          r.pendingResolvers.clear();
+          r.pending.clear();
+          emit(r, 'system.halted', undefined, undefined, { reason: 'Emergency Stop requested by operator' });
+          emit(r, 'agent.state_changed', 'M0', undefined, { agent_id: 'M0', from: 'WORKING', to: 'IDLE' });
+          emit(r, 'agent.state_changed', 'W_backend_0', undefined, { agent_id: 'W_backend_0', from: 'WORKING', to: 'IDLE' });
+          emit(r, 'agent.state_changed', 'W_frontend_0', undefined, { agent_id: 'W_frontend_0', from: 'WORKING', to: 'IDLE' });
+          emit(r, 'agent.state_changed', 'W_qa_0', undefined, { agent_id: 'W_qa_0', from: 'WORKING', to: 'IDLE' });
+          emit(r, 'blackboard.note', 'M0', undefined, {
+            id: 'halt_' + Date.now(),
+            author_agent_id: 'M0',
+            topic: 'EMERGENCY_STOP',
+            note: '🛑 Entire system halted by operator. All tasks and workers terminated.',
+            ts: '10:00'
+          });
+        }
+        return json(res, 200, { ok: true, stopped: runs.size });
+      }
+
+      m = p.match(/^\/api\/(?:tasks|runs)\/([^/]+)\/cancel$/);
+      if (m && req.method === 'POST') {
+        const targetId = m[1];
+        for (const r of runs.values()) {
+          if (r.id.replace('run_', 'task_') === targetId || r.id === targetId) {
             r.done = true;
+            if (r.timer) clearInterval(r.timer);
+            for (const resolver of r.pendingResolvers.values()) {
+              resolver('reject');
+            }
+            r.pendingResolvers.clear();
+            r.pending.clear();
+            emit(r, 'system.halted', undefined, undefined, { reason: 'Cancelled by operator' });
+            emit(r, 'agent.state_changed', 'M0', undefined, { agent_id: 'M0', from: 'WORKING', to: 'IDLE' });
+            emit(r, 'agent.state_changed', 'W_backend_0', undefined, { agent_id: 'W_backend_0', from: 'WORKING', to: 'IDLE' });
+            emit(r, 'agent.state_changed', 'W_frontend_0', undefined, { agent_id: 'W_frontend_0', from: 'WORKING', to: 'IDLE' });
+            emit(r, 'agent.state_changed', 'W_qa_0', undefined, { agent_id: 'W_qa_0', from: 'WORKING', to: 'IDLE' });
           }
         }
         return json(res, 200, { ok: true });

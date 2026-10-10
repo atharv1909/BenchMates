@@ -8,6 +8,10 @@ export interface ChatMessage {
 }
 
 class ManagerMemoryAgent {
+  public reset(): void {
+    const mgr = director.rt('M0');
+    if (mgr) mgr.bubble = undefined;
+  }
   private history: ChatMessage[] = [];
 
   public getHistory(): ChatMessage[] {
@@ -119,16 +123,12 @@ class ManagerMemoryAgent {
     }
     // 3. Stop / Cancel / Pause
     else if (lower.includes('stop') || lower.includes('halt') || lower.includes('cancel') || lower.includes('pause')) {
-      reply = `Directive acknowledged. Halting all active worker execution loops. Branch checkpoints are safely frozen.`;
-      blackboardNote = `Execution suspended by manager directive.`;
+      reply = `Emergency Stop acknowledged. Halting entire system across all workers, tasks, manager loops, and processes.`;
+      blackboardNote = `Entire system halted by operator directive.`;
 
-      const updatedTasks = { ...s.tasks };
-      for (const tid of Object.keys(updatedTasks)) {
-        if (updatedTasks[tid].status === 'running') {
-          updatedTasks[tid] = { ...updatedTasks[tid], status: 'failed' };
-        }
-      }
-      useStore.setState({ tasks: updatedTasks });
+      import('@/state/engine').then(({ haltEntireSystem }) => {
+        haltEntireSystem();
+      });
     }
     // 4. Real LLM Reasoning & Technical Conversation Engine
     else {

@@ -2,6 +2,7 @@ import { useMemo, useRef, useState, useEffect } from 'react';
 import { useStore } from '@/state/store';
 import { Icon, I } from './Icons';
 import { managerAgent } from '@/sim/managerAgent';
+import { haltEntireSystem } from '@/state/engine';
 
 export function EventLog() {
   const log = useStore((s) => s.log);
@@ -31,6 +32,11 @@ export function EventLog() {
     const text = (rawText ?? managerInput).trim();
     if (!text || isProcessing) return;
     setManagerInput('');
+
+    if (/^(stop|halt|cancel|emergency stop|freeze all|stop all)$/i.test(text.trim())) {
+      await haltEntireSystem();
+      return;
+    }
     setIsProcessing(true);
 
     const s = useStore.getState();
@@ -130,11 +136,12 @@ export function EventLog() {
               Continue
             </button>
             <button
-              onClick={() => sendCommand('stop current task')}
-              className="text-[10px] font-heading font-medium px-2 py-1 rounded-lg border border-red-500/20 bg-paper hover:bg-red-50 text-red-600 transition-colors"
-              title="Pause all work"
+              onClick={() => haltEntireSystem()}
+              className="text-[10px] font-heading font-bold px-2.5 py-1 rounded-lg border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-600 transition-colors flex items-center gap-1 shadow-xs"
+              title="Emergency Stop: Halt entire system, all workers, tasks, and LLM calls"
             >
-              Stop
+              <span>🛑</span>
+              <span>Stop All</span>
             </button>
           </div>
         </div>

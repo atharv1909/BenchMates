@@ -81,18 +81,27 @@ export async function callLLM(
   systemPrompt = 'You are an expert AI software architect and senior developer.',
   meta?: LLMMeta
 ): Promise<string> {
+  if (meta?.run?.done) throw new Error('Execution cancelled by operator');
   loadEnv();
   const groqKey = process.env.GROQ_API_KEY;
   const openRouterKey = process.env.OPENROUTER_API_KEY;
+  const deepseekKey = process.env.DEEPSEEK_API_KEY;
 
   // Ordered by parameter size & reasoning power
   const modelCandidates = [
-    { provider: 'groq', model: 'openai/gpt-oss-120b', maxTokens: 3500, displayName: 'gpt-oss-120b (Groq 120B)' },
-    { provider: 'groq', model: 'qwen/qwen3.8-27b', maxTokens: 3500, displayName: 'qwen3.8-27b (Groq 27B)' },
-    { provider: 'groq', model: 'openai/gpt-oss-20b', maxTokens: 2000, displayName: 'gpt-oss-20b (Groq 20B)' },
-    { provider: 'openrouter', model: 'nvidia/nemotron-3-super-120b-a12b:free', maxTokens: 2500, displayName: 'nemotron-120b (OpenRouter Free)' },
-    { provider: 'openrouter', model: 'google/gemma-4-31b-it:free', maxTokens: 2000, displayName: 'gemma-4-31b (OpenRouter Free)' },
-    { provider: 'openrouter', model: 'cohere/north-mini-code:free', maxTokens: 2000, displayName: 'north-mini-code (OpenRouter Free)' }
+    // 1. High-Performance DeepSeek R1 & V3 via OpenRouter (Verified Active)
+    { provider: 'openrouter', model: 'deepseek/deepseek-r1', maxTokens: 4096, displayName: 'DeepSeek-R1 (OpenRouter)' },
+    { provider: 'openrouter', model: 'deepseek/deepseek-chat', maxTokens: 4096, displayName: 'DeepSeek-V3 (OpenRouter)' },
+    // 2. Direct DeepSeek API (if DEEPSEEK_API_KEY is provided)
+    { provider: 'deepseek', model: 'deepseek-reasoner', maxTokens: 4096, displayName: 'DeepSeek-R1 (Direct)' },
+    { provider: 'deepseek', model: 'deepseek-chat', maxTokens: 4096, displayName: 'DeepSeek-V3 (Direct)' },
+    // 3. OpenRouter Free & High-Capability Fallbacks
+    { provider: 'openrouter', model: 'meta-llama/llama-3.3-70b-instruct:free', maxTokens: 3000, displayName: 'Llama-3.3-70B (OpenRouter)' },
+    { provider: 'openrouter', model: 'nvidia/nemotron-3-super-120b-a12b:free', maxTokens: 2500, displayName: 'Nemotron-120B (OpenRouter)' },
+    { provider: 'openrouter', model: 'google/gemma-2-9b-it:free', maxTokens: 2000, displayName: 'Gemma-2-9B (OpenRouter)' },
+    // 4. Groq Fallbacks (if valid Groq key is supplied)
+    { provider: 'groq', model: 'llama-3.3-70b-versatile', maxTokens: 3500, displayName: 'Llama-3.3-70B (Groq)' },
+    { provider: 'groq', model: 'deepseek-r1-distill-llama-70b', maxTokens: 3500, displayName: 'DeepSeek-R1-70B (Groq)' }
   ];
 
   let lastError: any = null;
@@ -100,7 +109,8 @@ export async function callLLM(
   for (let mIdx = 0; mIdx < modelCandidates.length; mIdx++) {
     const candidate = modelCandidates[mIdx];
     const isGroq = candidate.provider === 'groq';
-    const apiKey = isGroq ? groqKey : openRouterKey;
+    const isDeepSeek = candidate.provider === 'deepseek';
+    const apiKey = isDeepSeek ? deepseekKey : (isGroq ? groqKey : openRouterKey);
 
     if (!apiKey) continue;
 
@@ -117,9 +127,11 @@ export async function callLLM(
     const maxAttempts = isGroq ? 2 : 1;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        const endpoint = isGroq
-          ? 'https://api.groq.com/openai/v1/chat/completions'
-          : 'https://openrouter.ai/api/v1/chat/completions';
+        const endpoint = isDeepSeek
+          ? 'https://api.deepseek.com/chat/completions'
+          : (isGroq
+            ? 'https://api.groq.com/openai/v1/chat/completions'
+            : 'https://openrouter.ai/api/v1/chat/completions');
 
         const headers: Record<string, string> = {
           'Authorization': `Bearer ${apiKey}`,
@@ -136,7 +148,7 @@ export async function callLLM(
         const resp = await fetch(endpoint, {
           method: 'POST',
           headers,
-          signal: AbortSignal.timeout(35000),
+          signal: AbortSignal.timeout(65000),
           body: JSON.stringify({
             model: candidate.model,
             messages: [
@@ -156,7 +168,13 @@ export async function callLLM(
 
           if (attempt < maxAttempts) {
             console.log(`[Backoff] Waiting ${waitSec}s before retrying ${candidate.model}...`);
+            if (meta?.run && meta?.agentId) {
+              emitEvent(meta.run, 'agent.break_start', meta.agentId, undefined, { kind: 'coffee' });
+            }
             await new Promise(r => setTimeout(r, waitSec * 1000));
+            if (meta?.run && meta?.agentId) {
+              emitEvent(meta.run, 'agent.break_end', meta.agentId, undefined, {});
+            }
             continue;
           }
 
@@ -222,6 +240,7 @@ export async function requestPermission(
   effect: string,
   preview: string
 ): Promise<boolean> {
+  if (run.done) return false;
   if (run.alwaysAllowed.has('all') || run.alwaysAllowed.has(action)) {
     return true;
   }
@@ -473,6 +492,7 @@ Format your answer strictly as a JSON object:
 
     // Step C: Execute Each Milestone Task with Assigned Agent
     for (const task of plan.tasks) {
+      if (run.done) return; // Check operator cancellation
       const agentId = task.assigned_agent || 'W_backend_0';
       const agentName = team.find(a => a.id === agentId)?.name || 'Engineer';
 

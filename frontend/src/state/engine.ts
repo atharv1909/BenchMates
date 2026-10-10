@@ -8,7 +8,7 @@ import { triage } from '@/mock/triage';
 import goldenRun from '@/mock/goldenRun.json';
 
 export interface RunEngine {
-  start(goal: string): void;
+  start(goal: string): Promise<void> | void;
   stop(): void;
   setSpeed(f: number): void;
   pause(p: boolean): void;
@@ -34,12 +34,22 @@ class MockEngine implements RunEngine {
   private lastTick = 0;
   private startedAt = 0;
 
-  start(goal: string) {
+  async start(goal: string) {
     this.stop();
     director.reset();
     useStore.getState().resetRun(goal);
     director.pace = triage(goal).break_policy.pace;
-    this.sim = new MockSimulator(goal);
+    const st = useStore.getState();
+    if (st.appMode === 'swarm') {
+      const { rebuildSwarmDirector } = await import('@/swarm/directorRef');
+      const { buildSwarmScript } = await import('@/swarm/mockSwarm');
+      const { applyRoleColors } = await import('@/swarm/roles');
+      rebuildSwarmDirector(st.swarmSize);
+      applyRoleColors(st.accent);
+      this.sim = new MockSimulator(goal, buildSwarmScript(goal, st.swarmSize));
+    } else {
+      this.sim = new MockSimulator(goal);
+    }
     this.replayTape = [];
     this.startedAt = performance.now();
     this.lastTick = 0;
@@ -104,6 +114,7 @@ function fakeTick(elapsed: number): Envelope {
 class LiveEngine implements RunEngine {
   private stream: EventStream | null = null;
   private client: ApiClient = new HttpClient();
+  private currentRunId: string | null = null;
   replayTape: Envelope[] = [];
   async start(goal: string) {
     this.stop();
@@ -111,7 +122,19 @@ class LiveEngine implements RunEngine {
     useStore.getState().resetRun(goal);
     this.replayTape = [];
     try {
-      const { run_id } = await this.client.createTask(goal, useStore.getState().modelId, { profile: useStore.getState().profile } as any);
+      const st = useStore.getState();
+      if (st.appMode === 'swarm') {
+        const { rebuildSwarmDirector } = await import('@/swarm/directorRef');
+        const { applyRoleColors } = await import('@/swarm/roles');
+        rebuildSwarmDirector(st.swarmSize);
+        applyRoleColors(st.accent);
+      }
+      const { run_id } = await this.client.createTask(
+        goal,
+        st.modelId,
+        { profile: st.profile, mode: st.appMode, swarm_size: st.swarmSize } as any
+      );
+      this.currentRunId = run_id;
       this.stream = new HttpStream();
       this.stream.start(run_id, 0, (e) => {
         const ev = parseEvent(e);
@@ -125,7 +148,14 @@ class LiveEngine implements RunEngine {
       useStore.setState({ offline: true });
     }
   }
-  stop() { this.stream?.stop(); this.stream = null; }
+  stop() {
+    if (this.currentRunId) {
+      this.client.cancelTask(this.currentRunId).catch(() => {});
+      this.currentRunId = null;
+    }
+    this.stream?.stop();
+    this.stream = null;
+  }
   setSpeed(f: number) { this.stream?.setSpeed(f); }
   pause(p: boolean) { useStore.setState({ paused: p }); }
   seek(_idx: number) { /* live runs are not scrubbable */ }
@@ -138,4 +168,52 @@ class LiveEngine implements RunEngine {
 }
 
 export const engine: RunEngine = USE_MOCK ? new MockEngine() : new LiveEngine();
+
+export async function haltEntireSystem() {
+  const s = useStore.getState();
+  const now = s.simClock || '10:00';
+
+  useStore.setState({
+    log: [
+      ...s.log,
+      {
+        id: Date.now(),
+        ts_sim: now,
+        type: 'system.halt',
+        text: '🛑 EMERGENCY STOP: Entire system halted. All agent workflows, tasks, and file operations terminated.',
+      },
+    ],
+    pendingPermissions: [],
+    paused: true,
+  });
+
+  engine.stop();
+
+  const updatedTasks = { ...s.tasks };
+  for (const tid of Object.keys(updatedTasks)) {
+    if (updatedTasks[tid].status === 'running' || updatedTasks[tid].status === 'pending') {
+      updatedTasks[tid] = { ...updatedTasks[tid], status: 'failed' };
+    }
+  }
+
+  const updatedAgents = { ...s.agents };
+  for (const aid of Object.keys(updatedAgents)) {
+    updatedAgents[aid] = { ...updatedAgents[aid], status: 'IDLE' };
+  }
+
+  useStore.setState({
+    tasks: updatedTasks,
+    agents: updatedAgents,
+    swarm: { ...s.swarm, speakingId: null },
+  });
+
+  try {
+    await fetch('http://localhost:8000/api/tasks/cancel_all', { method: 'POST' });
+  } catch {}
+
+  try {
+    const { managerAgent } = await import('@/sim/managerAgent');
+    managerAgent.reset();
+  } catch {}
+}
 export const GOLDEN_GOAL = goldenRun.goal;
