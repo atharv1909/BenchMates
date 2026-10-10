@@ -248,3 +248,40 @@ The completed project will produce:
 3. **Access the Application:**
    - 3D Virtual Floor: `http://localhost:5173`
    - Bridge Health & API: `http://localhost:8000`
+
+---
+
+## ⚠️ API Keys & Requirements Disclaimer
+
+GravityDesk operates a real autonomous multi-agent engineering floor with automated model failover.
+
+### Required API Keys (`.env` in root)
+Create a `.env` file in the root directory with at least one active key (Groq recommended for high-speed code generation):
+
+```ini
+# Primary High-Speed & Reasoning Provider (Free tier supported)
+# Powers: openai/gpt-oss-120b (120B Flagship) & qwen/qwen3.8-27b
+GROQ_API_KEY=gsk_...
+
+# Secondary Cloud Fallback Provider (Free tier models)
+# Powers: nvidia/nemotron-3-super-120b-a12b:free, google/gemma-4-31b-it:free
+OPENROUTER_API_KEY=sk-or-v1-...
+
+# Optional Cloud NIM Provider
+NVIDIA_API_KEY=nvapi-...
+
+# Environment settings
+VITE_USE_MOCK=false
+VITE_API_URL=http://localhost:8000
+PORT=8000
+```
+
+### Rate Limits & Autonomous Model Failover Policy
+- When using free-tier API quotas, per-minute token ceilings (TPM) can be reached during heavy multi-agent code generation.
+- **Auto-Failover**: GravityDesk automatically catches HTTP 429 rate limit responses, applies exponential backoff, and seamlessly rotates between `gpt-oss-120b`, `qwen3.8-27b`, and OpenRouter models in real-time so execution tasks never stall.
+
+### Local System Requirements
+- **Node.js 18+** & npm.
+- **Python 3.10+** (in system `PATH`) with `pypdf` (`pip install pypdf`) for reading documents/PDF prompts and running automated QA test gates.
+- **Permission Guard**: By default, file reads and disk writes to `D:\GravityDesk\output\` require interactive user approval via the 3D UI. Click **"Always (project)"** to grant permission for the session.
+
