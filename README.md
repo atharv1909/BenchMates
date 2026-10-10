@@ -1,287 +1,318 @@
-# GravityDesk: 3D Autonomous Multi-Agent Software Engineering Floor
+<!-- Animated Header with Walking AI Agents -->
+<p align="center">
+  <img src="assets/gravitydesk_header.svg" alt="GravityDesk Animated Header" width="100%">
+</p>
 
-## 1. Project Name
-**GravityDesk** (Autonomous Multi-Agent Engineering Floor with Heterogeneous Open-Source Model Routing)
+<!-- Hero Banner -->
+<p align="center">
+  <img src="assets/gravitydesk_banner.jpg" alt="GravityDesk - Multi-Agent Software Engineering Floor" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
+</p>
 
----
+<!-- Badges -->
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/badge/GravityDesk-v2.0_Production-7b2ff7?style=for-the-badge&logo=rocket&logoColor=white" alt="GravityDesk v2.0"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Three.js-WebGL_3D_Floor-000000?style=for-the-badge&logo=threedotjs&logoColor=white" alt="Three.js WebGL"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Dual_Engine-Office_%26_Swarm-00d4ff?style=for-the-badge" alt="Dual Engine"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Open_Weight-DeepSeek--R1_%7C_Groq_%7C_Qwen-34d399?style=for-the-badge&logo=huggingface&logoColor=white" alt="Open Weights"></a>
+  <a href="#"><img src="https://img.shields.io/badge/License-MIT-ff7518?style=for-the-badge" alt="MIT License"></a>
+</p>
 
-## 2. Problem Statement
-Current generative AI coding tools predominantly function as isolated, single-turn text interfaces or linear pair-programming chat widgets. While suitable for localized code completions, this paradigm breaks down on complex software engineering objectives that require:
-1. **Multi-Disciplinary Division of Labor:** Real engineering tasks demand simultaneous planning, architectural design, dependency resolution, API development, test writing, and technical documentation. A single model prompt attempting to handle all roles simultaneously suffers from severe context dilution, hallucination, and instruction drift.
-2. **Provider Bottlenecks and Rate Limits:** Relying on a single model or endpoint creates critical throughput bottlenecks. When multiple autonomous agent loops execute concurrent file reads, tool executions, and tests, they rapidly exhaust provider Rate Limits (Requests Per Minute - RPM, and Tokens Per Minute - TPM).
-3. **Opacity in Autonomous Execution:** In terminal-only or text-only agent runners, users cannot intuitively inspect which agent is blocked on dependencies, which model is generating code, where inter-agent reviews fail, or what safety permissions are pending. The lack of spatial and structural visibility leads to distrust and premature termination of long-running tasks.
-
----
-
-## 3. Project Overview
-GravityDesk is a proposed multi-agent autonomous engineering system that models software development as a collaborative, physical office environment rendered in an interactive 3D canvas (Three.js / React Three Fiber) backed by a local Provider Gateway and terminal-level execution runtime. 
-
-Instead of routing an entire task to a single LLM, GravityDesk decomposes the objective across specialized department leads and workers. Each agent operates under a designated role profile, context quota, and toolset, powered by an optimized open-source / open-weight model suited specifically to that role. All activities—code generation, code review, inter-agent chats, dependency handoffs, test executions, and coffee breaks during context compaction—are driven deterministically by an event stream and visualized in real time.
-
----
-
-## 4. Proposed Solution
-GravityDesk proposes an integrated, three-tier architecture:
-1. **The 3D Virtual Floor (Frontend Observer):** An isometric 3D workplace interface where agents physically sit at workstations, move between department bays (Frontend, Backend, Research, QA, Data, Content), access meeting rooms for synchronous reviews, and visit the coffee pantry during token compaction phases.
-2. **The Provider Gateway and Mediation Bridge:** An asynchronous gateway that performs context-aware routing across heterogeneous open-weight models, token-bucket rate limiting, priority queuing with queue aging, circuit breaking, and streaming WebSocket event fanout.
-3. **The Execution Engine (RealGravity Runtime):** A headless terminal runtime enforcing isolated Git worktrees, AST-level code diffs, command sandboxing, and strict permission escalation gates before any destructive action is executed on the host filesystem.
-
----
-
-## 5. Objectives
-- **Role-Based Task Decomposition:** Automatically triage user goals and decompose them into an acyclic task graph (DAG) executed by specialized agents rather than a monolithic prompt.
-- **Heterogeneous Model Orchestration:** Distribute distinct roles (Triage Manager, Department Lead, Code Generation Worker, Documentation Specialist) across specialized open-weight models (Qwen 3.8 27B, Nemotron 70B / 3.5, GPT-OSS, Gemma 31B, DeepSeek) to maximize inference efficiency and prevent single-provider rate-limit starvation.
-- **Spatial Observability:** Replace opaque terminal logs with an interactive 3D spatial interface where users can inspect agent memory, context pressure, active tool executions, and token consumption at a glance.
-- **Safe Host Integration:** Ensure all terminal and file modifications remain strictly sandboxed with one-click permission gating and instantaneous Git rollback capabilities.
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/badge/React-18.3-61dafb?style=flat-square&logo=react" alt="React 18"></a>
+  <a href="#"><img src="https://img.shields.io/badge/TypeScript-5.5-3178c6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Zustand-State_Engine-orange?style=flat-square" alt="Zustand"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Vitest-38_Passing-green?style=flat-square&logo=vitest" alt="Vitest"></a>
+</p>
 
 ---
 
-## 6. Target Users / Use Cases
-### Target Users
-- **Software Engineering Teams & Tech Leads:** Overseeing complex refactors, multi-package library migrations, or full-stack feature implementations.
-- **Autonomous Systems Researchers:** Studying multi-agent coordination dynamics, inter-agent communication protocols, and context degradation.
-- **Open-Source AI Developers:** Seeking a production-grade local orchestration harness that runs on free open-weight model tiers without expensive proprietary API lock-in.
-
-### Primary Use Cases
-1. **Full-Stack Feature Development:** From one prompt, Frontend workers write React/TypeScript components, Backend workers build REST/WebSocket endpoints, and QA workers draft automated test suites.
-2. **Competitive Benchmark & Tech Evaluation:** Research agents query local or web search indexes, analyze library repositories, and synthesize comparative technical whitepapers.
-3. **Systematic Code Refactoring & Test Hardening:** Autonomous scanning of existing codebases, identifying untested branches, writing test harnesses, and incrementally applying validated patches.
+### The world's first spatially-grounded, multi-agent autonomous engineering simulation where specialized AI agents plan, debate in swarms, cross-examine architectures, and deliver production-ready code inside an observable real-time 3D workspace.
 
 ---
 
-## 7. Open-Source AI Technology Selected
-GravityDesk strategically selects a heterogeneous ensemble of top-tier open-source and open-weight foundation models:
+## 📑 Table of Contents
+- [1. Executive Overview](#1-executive-overview)
+- [2. The Three Failures of Current AI Coding](#2-the-three-failures-of-current-ai-coding)
+- [3. Dual Working Modalities](#3-dual-working-modalities)
+  - [Mode A: Deskmates Collaborative Office](#mode-a-deskmates-collaborative-office-core-team)
+  - [Mode B: Swarm Hall Consensus Council](#mode-b-swarm-hall-consensus-council-10--50-agents)
+- [4. The 6-Phase Swarm Consensus Protocol](#4-the-6-phase-swarm-consensus-protocol)
+- [5. System Architecture & Information Flow](#5-system-architecture--information-flow)
+- [6. Competitive Teardown & USPs](#6-competitive-teardown--usps)
+- [7. Heterogeneous Model Inference Mesh](#7-heterogeneous-model-inference-mesh)
+- [8. Security, Sandboxing & Egress Privacy](#8-security-sandboxing--egress-privacy)
+- [9. Quick Start Guide](#9-quick-start-guide)
+- [10. Verification & Test Suite](#10-verification--test-suite)
 
-| Role | Primary Selected Model | Secondary / Fallback Model | Provider Infrastructure |
+---
+
+## 1. Executive Overview
+
+Current generative AI coding tools predominantly function as isolated, single-turn text interfaces or linear pair-programming chat widgets. While suitable for single-file scripts or localized completions, this paradigm collapses on complex software engineering objectives.
+
+**GravityDesk** fundamentally reimagines software development as a collaborative, physical engineering floor rendered in an interactive **3D isometric WebGL workspace (Three.js / React Three Fiber / WebGL)**, coordinated by an **Asynchronous Mediation Bridge**, and driven by an event-sourced monotonic execution tape.
+
+Every agent action—architectural decomposition, peer code review, inter-agent debates, tool executions, file writing, and even **coffee breaks during API rate-limit backoffs**—is spatially visible and steerable in real time.
+
+---
+
+## 2. The Three Failures of Current AI Coding
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        WHY CONVENTIONAL AGENTS FAIL                    │
+├────────────────────────────────────────────────────────────────────────┤
+│ 1. CONTEXT DILUTION: One generalist prompt attempting to architect,    │
+│    write backend APIs, craft CSS, and write unit tests suffers from   │
+│    instruction drift, imports hallucination, and superficial logic.    │
+│                                                                        │
+│ 2. RATE-LIMIT FRAGILITY: High-frequency agent tool loops trigger       │
+│    HTTP 429 errors on API providers, causing silent drops or crashes.  │
+│                                                                        │
+│ 3. COGNITIVE OPACITY: Text-only terminal harnesses dump 100,000 log    │
+│    lines. A human cannot tell who is stuck, what is blocked, or why    │
+│    a decision was made until token budgets are completely burned.      │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 3. Dual Working Modalities
+
+GravityDesk provides two purpose-built modes tailored to different phases of the software engineering lifecycle:
+
+### Mode A: Deskmates Collaborative Office (Core Team)
+Built for **iterative sprint execution, full-stack development, and test-driven refactoring**:
+- **Core Engineering Hierarchy:**
+  - 👩‍💼 **Diya (Lead Manager):** Goal formulation, DAG triage, cross-department coordination, and operator chat.
+  - 👨‍💻 **Rohan (Backend Engineer):** High-throughput REST/WebSocket services, data schemas, and concurrency logic.
+  - 🎨 **Kabir (Frontend Engineer):** Component trees, responsive design, UI interaction, and CSS architecture.
+  - 🧪 **Nisha (QA & Test Architect):** Acceptance testing, edge-case analysis, and CI/CD validation.
+- **Physical Zone Dynamics:** Agents physically walk via **A\* NavMesh pathfinding** between workstations, meeting rooms, whiteboard standups, and the coffee pantry during token compaction.
+
+---
+
+### Mode B: Swarm Hall Consensus Council (10 – 50 Agents)
+Built for **high-stakes architectural design, systems synthesis, and zero-compromise engineering**:
+- **The Grand Deliberation Hall:** An oval conference amphitheater where 10, 20, or 50 specialized agents sit in **inward-facing executive chairs** around a centralized conference table with Moderator Diya at the podium.
+- **Specialized Roles:** Security Auditors, Distributed Systems Architects, Real-Time Latency Engineers, Memory Safety Specialists, Formal Verifiers, Performance Profilers, and Protocol Engineers.
+- **Dynamic Deliverables:** Synthesizes complete, production-ready multi-file implementations written directly to the host filesystem under `output/<ProjectSlug>_Swarm/`.
+
+---
+
+## 4. The 6-Phase Swarm Consensus Protocol
+
+To eliminate echo-chambers and guarantee rigorous architectural evaluation, the Swarm operates under a mathematical 6-phase consensus protocol:
+
+```mermaid
+flowchart TD
+    A([User Objective Submitted]) --> B[Phase 1: Framing]
+    B --> C[Phase 2: Divergence]
+    C --> D[Phase 3: Semantic Clustering]
+    D --> E[Phase 4: Adversarial Critique]
+    E --> F[Phase 5: Weighted Quorum Voting]
+    F --> G{Consensus >= 70%?}
+    G -- No: Re-frame --> B
+    G -- Yes: Quorum Reached --> H[Phase 6: Synthesis & Code Generation]
+    H --> I([Production Project Output on Host Disk])
+
+    style B fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff
+    style C fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff
+    style D fill:#3b0764,stroke:#c084fc,stroke-width:2px,color:#fff
+    style E fill:#701a75,stroke:#f472b6,stroke-width:2px,color:#fff
+    style F fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#fff
+    style H fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#fff
+```
+
+1. **Phase 1: Framing** — Lead Manager Diya deconstructs the prompt into orthogonal architectural vectors (e.g., Memory Layout, Concurrency, Zero-Copy IPC, Audit Logging).
+2. **Phase 2: Divergence (Proposals)** — All 20/50 specialized agents independently formulate technical proposals in isolation, preventing groupthink and early bias.
+3. **Phase 3: Semantic Clustering** — Proposals are dynamically categorized into orthogonal architectural archetypes on the 3D Idea Board, reducing communication complexity from quadratic $O(N^2)$ to $O(N \cdot K)$.
+4. **Phase 4: Adversarial Peer Critique** — Agents are programmatically assigned opposing stances (`SUPPORT` vs. `CHALLENGE`) to probe race conditions, memory bottlenecks, and failure modes.
+5. **Phase 5: Weighted Quorum Voting** — Borda / Quadratic voting tallies agreement scores across all clusters.
+6. **Phase 6: Synthesis & Code Generation** — Synthesizes the winning architectural consensus into complete, runnable multi-file source trees written directly to host storage.
+
+---
+
+## 5. System Architecture & Information Flow
+
+### Component-Level Architecture
+```mermaid
+flowchart TB
+    U["👤 Human Operator<br/>(Directives & Safety Approvals)"]
+
+    subgraph FLOOR["Tier 1: 3D Spatial Presentation Floor (React 18 + Three.js)"]
+        direction LR
+        CANVAS["3D WebGL Canvas<br/>(Office / Swarm Hall)"]
+        DAG["Interactive Task DAG<br/>(Dagre Layout)"]
+        BOARD["Idea Blackboard<br/>(Live Post-its)"]
+        INSP["Agent Inspector &<br/>Live Diya Chat"]
+        GATE_MODAL["Security Escalation Modal<br/>& Emergency Stop"]
+    end
+
+    subgraph BRIDGE["Tier 2: Asynchronous Mediation Bridge (Node.js / Express / WS)"]
+        direction TB
+        BUS["Monotonic Event Bus<br/>(seq-tracked, replay buffer)"]
+        PACER["Virtual Clock Pacemaker<br/>(Advisory Pacing Control)"]
+        DELIB["Swarm Consensus Engine<br/>(6-Phase State Machine)"]
+        SAFE["Sandboxed File Egress &<br/>Code Block Parser"]
+    end
+
+    subgraph MESH["Tier 3: Multi-Model Inference Mesh (OpenRouter / Groq / NIM)"]
+        direction LR
+        REASON["DeepSeek-R1<br/>(CoT Reasoning Trace)"]
+        CHAT["DeepSeek-V3 / Qwen-2.5<br/>(Fast Swarm Debate)"]
+        LPU["Groq Llama-3.3-70B<br/>(Sub-second Classify)"]
+        BACKOFF["Jittered Exponential Backoff<br/>& Coffee Break Trigger"]
+    end
+
+    U <--> FLOOR
+    FLOOR <-->|"WebSocket (/ws/events) + REST (/api/*)"| BRIDGE
+    BRIDGE <--> MESH
+```
+
+### Event Sequence & Coffee Break Flow
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Human Operator
+    participant UI as 3D WebGL Floor
+    participant Bridge as Mediation Bridge
+    participant LLM as Multi-Model Mesh
+    participant Disk as Host Filesystem
+
+    User->>UI: Submit Objective (e.g. Lock-Free LOB in Rust)
+    UI->>Bridge: POST /api/tasks { goal, mode: 'swarm', swarm_size: 20 }
+    Bridge-->>UI: WebSocket broadcast (swarm.started, run_id)
+    Note over UI: Agents walk in and take inward seats at the conference table
+    Bridge->>LLM: Phase 1 Framing Request (DeepSeek-R1)
+    LLM-->>Bridge: Architectural Breakdown & Clustering Dimensions
+    Bridge-->>UI: swarm.phase { phase: 'diverge' }
+    
+    alt Provider HTTP 429 Rate Limit Encountered
+        LLM-->>Bridge: 429 Rate Limit (Cooldown: 15s)
+        Bridge-->>UI: agent.break_start { agent_id, kind: 'coffee' }
+        Note over UI: Agent stands up, walks to coffee corner, drinks coffee
+        Bridge->>Bridge: Wait for exponential backoff window
+        Bridge-->>UI: agent.break_end { agent_id }
+        Note over UI: Agent returns to desk / seat and resumes work
+    end
+
+    Bridge->>LLM: Multi-Agent Proposal & Critique Synthesis
+    LLM-->>Bridge: Final Multi-File Source Code Blocks
+    Bridge->>Disk: Write source files to output/<AutoSlug>_Swarm/
+    Bridge-->>UI: swarm.phase { phase: 'done' }, report.ready
+    User->>UI: Inspect final deliverable in 3D Report Viewer
+```
+
+---
+
+## 6. Competitive Teardown & USPs
+
+| Capability | **GravityDesk** | **Devin / Cursor** | **AutoGPT / CrewAI** | **MetaGPT / ChatDev** |
+| :--- | :---: | :---: | :---: | :---: |
+| **Observability Interface** | **Interactive 3D WebGL (Three.js)** | 2D Text / Webview | Plain Terminal Logs | 2D Pixel Sprites |
+| **Deliberation Architecture** | **Dual-Engine (Office + 50-Agent Swarm)** | Single-Agent Linear | Scripted DAG Graph | Fixed Waterfall Chat |
+| **API Rate-Limit Handling** | **Visual 3D Coffee Break Backoff** | Fatal Error / Spinner | Crash / Silent Drop | Re-prompt Loop |
+| **Deliberation Token Complexity** | **$O(N \cdot K)$ via Semantic Clustering** | N/A ($N=1$) | $O(N^2)$ Quadratic Explosion | $O(N^2)$ Linear Chat |
+| **Model Heterogeneity** | **Live Failover across 4+ Open Providers** | Proprietary Closed | Single-API Provider | Single-API Provider |
+| **Deep Reasoning Preservation** | **65s CoT Window for DeepSeek-R1** | Truncated Tokens | Standard 30s Timeout | Standard 30s Timeout |
+| **Human-in-the-Loop Safety** | **Granular Gating + Emergency Stop** | Binary Auto-Run | Unsafe Local Execution | Mock Sandboxing |
+| **Prompt Synthesis Fidelity** | **100% Dynamic / Zero Hardcoding** | Dynamic Single-File | Fragmented Output | Pre-baked Templates |
+
+---
+
+## 7. Heterogeneous Model Inference Mesh
+
+GravityDesk eliminates single-provider downtime and token quota exhaustion through an adaptive routing matrix:
+
+| Role / Function | Primary Engine | Fallback Engine | Rationale |
 | :--- | :--- | :--- | :--- |
-| **Orchestration Manager (Diya)** | `openrouter/google/gemma-4-31b-it:free` | `nvidia/llama-3.1-nemotron-70b-instruct` | OpenRouter / NVIDIA NIM |
-| **Department Leads (Review & DAG)** | `openrouter/qwen/qwen3.8-27b:free` | `nvidia/deepseek-ai/deepseek-v4.1-flash` | OpenRouter / NVIDIA NIM |
-| **Code Workers (Frontend/Backend)** | `groq/qwen/qwen3.8-27b` | `groq/openai/gpt-oss-120b` | Groq LPU |
-| **Fast Edits & Terminal Workers** | `groq/openai/gpt-oss-20b` | `openrouter/cohere/north-mini-code:free` | Groq LPU / OpenRouter |
-| **Evaluation & QA Agents** | `openrouter/nvidia/nemotron-3.5-lightning:free` | `nvidia/llama-3.1-nemotron-70b-instruct` | OpenRouter / NVIDIA NIM |
-| **Documentation & Synthesis** | `go/glm-5.3-flash` | `openrouter/google/gemma-4-31b-it:free` | OpenCode Go / OpenRouter |
+| **Lead Manager & Synthesis** | `deepseek/deepseek-r1` | `deepseek/deepseek-chat` | Full chain-of-thought (CoT) analytical depth for architectural trade-offs. |
+| **Swarm Proposals & Critiques** | `deepseek/deepseek-chat` | `qwen/qwen-2.5-coder-32b` | High token velocity and instruction adherence for structured JSON/markdown. |
+| **Real-Time Classification** | `groq/llama-3.3-70b-versatile` | `meta-llama/llama-3.3-70b` | Sub-300ms LPU execution for instant triage and clustering. |
+| **Local Privacy Mode** | Local Ollama / vLLM (`llama3.2`) | Local Qwen-2.5 | 100% air-gapped, zero external egress execution. |
 
 ---
 
-## 8. Why This Technology Was Selected
-1. **Avoiding Single-Model Failure Modes:** Generalist models compromise between deep reasoning and low latency. By assigning `Qwen 3.8 27B` and `DeepSeek` to core coding, and `Gemma 31B` or `Nemotron 70B` to architectural planning and review, each stage uses the strongest model for that specific cognitive domain.
-2. **Rate Limit Diversification Across Free Tiers:** Free provider tiers strictly enforce quotas (e.g., Groq caps at 7,000 ITPM and 30 RPM; OpenRouter free models have individual rate buckets; NVIDIA NIM provides dedicated prototyping credits). Distributing roles across separate providers allows the system to sustain 10+ concurrent agents without triggering HTTP 429 rate limit exceptions.
-3. **Data Privacy and Sovereignty:** Open-weight models can be hosted locally via Ollama/vLLM or consumed through privacy-first inference APIs without granting proprietary vendors rights to train on user codebases.
+## 8. Security, Sandboxing & Egress Privacy
+
+1. **Permission Escalation Gates:** No autonomous action modifying files (`file.write`), running shell commands (`bash.exec`), or pushing git refs (`git.push`) can execute without clearing the human safety gate. The calling agent pauses its Promise while a UI modal displays diffs and rationale.
+2. **Emergency Stop (Kill Switch):** Hitting the red **Emergency Stop** button halts all active child processes, issues `/api/tasks/cancel_all`, terminates bridge timers, and forces all 3D agents into `IDLE`.
+3. **Strict Secret Isolation:** Real `.env` files are strictly excluded via `.gitignore`. All `.env.example` templates contain zero hardcoded credentials, and git history is pre-sanitized against GitHub Push Protection triggers.
 
 ---
 
-## 9. AI's Role in the System
-AI operates at every tier of the lifecycle:
-- **Triage & Classification:** Classifies incoming requests by complexity (`light`, `standard`, `heavy`), required departments, estimated execution seconds, and assigns the appropriate break/compaction policy.
-- **Hierarchical Planning:** The Manager generates a directed acyclic graph (DAG) of interdependent tasks.
-- **Autonomous Coding & Reasoning:** Workers run in autonomous tool loops executing file reads, syntax analysis, code edits, and command invocations.
-- **Peer & Lead Review:** Upon completing subtasks, worker agents submit diffs to their Department Lead for review. The lead validates the output, requests rework if tests fail, and delivers the consolidated branch to the Manager.
-
----
-
-## 10. System Architecture
-```
-                                 [ USER ]
-                                    │
-                                    ▼ (Goal Input / Approvals)
-  ┌────────────────────────────────────────────────────────────────────────┐
-  │                 GRAVITYDESK 3D VIRTUAL OFFICE                          │
-  │  Three.js Scene · Agent Rigs · Furniture · Minimap · Task DAG · Logs   │
-  └───────────────────────────────▲────────────────────────────────────────┘
-                                  │ WebSocket Events & HTTP REST (:8000)
-                                  ▼
-  ┌────────────────────────────────────────────────────────────────────────┐
-  │                 GRAVITYDESK BRIDGE & GATEWAY                           │
-  │  ┌──────────────────────┐  ┌─────────────────┐  ┌──────────────────┐  │
-  │  │  Triage & DAG Engine │  │ Event Bus & Tape │  │ Permission Gate  │  │
-  │  └──────────┬───────────┘  └────────┬─────────┘  └────────┬─────────┘  │
-  │             │                       │                     │            │
-  │             ▼                       ▼                     ▼            │
-  │  ┌──────────────────────────────────────────────────────────────────┐  │
-  │  │             HETEROGENEOUS MODEL ROUTING MATRIX                   │  │
-  │  │  Token-Bucket Limiter · Concurrency Lanes · AIMD Retry Backoff   │  │
-  │  └──────────────────┬───────────────┬──────────────┬────────────────┘  │
-  └─────────────────────┼───────────────┼──────────────┼───────────────────┘
-                        ▼               ▼              ▼
-               ┌────────────────┐┌─────────────┐┌──────────────┐
-               │   GROQ LPU     ││ NVIDIA NIM  ││  OPENROUTER  │
-               │ Fast Coder/Edit││ Architect/QA││ Manager/Lead │
-               └────────────────┘└─────────────┘└──────────────┘
-                        │
-                        ▼ (Tool & Shell Executions)
-  ┌────────────────────────────────────────────────────────────────────────┐
-  │                     REALGRAVITY EXECUTION ENGINE                       │
-  │  Git Worktrees · Sandboxed CLI Execution · AST Diffs · Host Rollback   │
-  └────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 11. Component-Level Architecture
-1. **`frontend/src/three/` (Spatial Rendering Engine):**
-   - `OfficeCanvas.tsx` & `StaticOffice.tsx`: Renders physical room geometry, desks, chairs, meeting rooms, glass partitions, and lighting.
-   - `AgentRig.ts`: Procedural humanoid character rig with walking kinematics, sitting postures, nodding/thinking gestures, and typing animations.
-   - `director.ts`: Pathfinding and action coordinator translating abstract lifecycle events (`task.started`, `agent.chat`, `break_start`) into physical 3D movements.
-2. **`frontend/src/ui/` (Observer & Control Interface):**
-   - `Toolbar.tsx`: Compact header providing sim clock controls, speed factors (1x, 10x, 60x), mode toggles, model selector, and zone jumps.
-   - `LeftPanel.tsx` & `DagView.tsx`: Displays hierarchical Org progress and interactive SVG Task DAG with smooth Bézier splines and live pulse animation.
-   - `Inspector.tsx`: Deep-dive inspector displaying selected agent status, assigned model, active tool terminal stream, and token energy meter.
-3. **`bridge/` (Mediation & Gateway Services):**
-   - `router.py`: Selects optimal provider and model based on role alias, required context length, and live provider health.
-   - `lane.py`: Manages per-provider token bucket rates and concurrency caps.
-   - `breaker.py`: Circuit breaker isolating failing providers without crashing the session.
-4. **`backend/` (Execution Core):**
-   - `pag.ps1` & `opencode.exe`: Lightweight Windows/Linux execution runtime supporting native mode (~80MB RAM) or Docker sandbox mode.
-
----
-
-## 12. Data / Information Flow
-```
-1. Goal Submitted ──► Triage Engine classifies task & generates DAG nodes
-2. Plan Emitted   ──► WebSocket broadcasts plan.ready to 3D Floor & DAG View
-3. Team Hired     ──► Director navigates agents from Reception to Department Desks
-4. Task Running   ──► Worker calls Gateway ──► Groq/NVIDIA/OpenRouter LLM API
-5. Terminal Exec  ──► RealGravity executes test/build in isolated Git branch
-6. Review Gate    ──► Worker submits output to Department Lead for review
-7. Lead Synthesis ──► Lead merges branch & reports milestone to Manager Diya
-8. Final Report   ──► Manager compiles findings & delivers Markdown deliverable
-```
-
----
-
-## 13. Agentic Workflow
-The system utilizes a structured, hierarchical agent workflow:
-1. **Manager (Diya):** Deconstructs goals into isolated milestones, determines department participation, and resolves cross-department blockers.
-2. **Department Leads (Aanya, Kabir, Nisha, Dev):** Own department-specific subgraphs. They assign work to team members, perform code and architectural reviews on completed tasks, and ensure unit tests pass.
-3. **Workers (Rohan, Meera, Isha, Vikram, Arjun, Tara):** Dedicated executors. They run code edits, tool invocations, and test suites. When task context exceeds 60%, they trigger compaction and move to the pantry for a coffee break, preventing context overflow.
-4. **Synchronous Meeting Protocol:** When two agents must resolve architectural dependencies, they physically walk to Meeting Rooms (M1/M2/M3) and initiate a structured chat sequence that pins findings to the shared Blackboard.
-
----
-
-## 14. Technology Stack
-- **Frontend & 3D Visualization:** React 18, Three.js, React Three Fiber (`@react-three/fiber`), Drei (`@react-three/drei`), Tailwind CSS, Framer Motion.
-- **State Management & Graph Layout:** Zustand, Dagre Graphlib (`@dagrejs/dagre`).
-- **Bridge & Gateway Server:** Node.js / TypeScript (`tsx`), Python 3.11+, WebSockets (`ws`), PyYAML, Pytest.
-- **AI Models & Providers:** Groq LPU API, NVIDIA NIM API, OpenRouter API, OpenCode Go.
-- **System Runtime & Tooling:** Windows PowerShell / Bash, Git worktree isolation, Vite build pipeline.
-
----
-
-## 15. Expected Features
-- **Deterministic 3D Office Simulation:** Complete spatial representation of office bays, conference rooms, manager cabin, server room, and cafeteria.
-- **Dynamic Task DAG Visualization:** Live graph updating in real time with animated data flows, status pills, and direct agent camera-focus on click.
-- **Hierarchical Team Reporting:** Workers report to Leads; Leads validate deliverables and report upward to the Manager, with accurate progress rollups.
-- **Adaptive Context Compaction:** Visual representation of agent token consumption; agents take visual breaks when context limits approach threshold.
-- **Human-in-the-Loop Permission Console:** Sensitive file deletions or terminal commands pause execution until user approval is granted.
-- **Multi-Model Provider Failover:** Automatic fallback to secondary open-weight models upon encountering rate limits or provider downtime.
-
----
-
-## 16. Implementation Approach
-The project follows a modular, incremental engineering implementation:
-1. **Phase 1: Environment & Floor Geometry:** Construct coordinate-accurate office layouts, collision boundaries, and chair orientations.
-2. **Phase 2: Rigging & Agent Kinematics:** Implement procedural walking, sitting, typing, and gestural state transitions in Three.js.
-3. **Phase 3: Gateway & Model Layer:** Configure rate-limiting token buckets and wire API keys for Groq, NVIDIA NIM, and OpenRouter.
-4. **Phase 4: Agentic Protocol & Real Hierarchy:** Establish structured communication pipelines where worker deliverables pass through lead validation before manager aggregation.
-5. **Phase 5: Real Execution & Host Bridge:** Connect the 3D office to the RealGravity execution engine for live repository editing and test verification.
-
----
-
-## 17. Expected Final Output
-The completed project will produce:
-- A responsive, low-latency 3D web application running on `http://localhost:5173`.
-- A fully operational mediation server on `http://localhost:8000` exposing REST endpoints and WebSocket feeds.
-- Verified autonomous code generation where real user prompts produce actual, tested software artifacts in repository branches.
-- Exportable structured run reports including complete execution timelines, model call latencies, token expenditures, and git commit hashes.
-
----
-
-## 18. Future Scope / Scalability
-- **Local On-Premise Worker Deployment:** Direct integration with Ollama and vLLM instances for 100% offline, air-gapped development floors.
-- **Multi-Floor Building Scaling:** Adding dedicated floors for larger virtual organizations (e.g., Floor 1: Core Systems, Floor 2: Mobile & Web, Floor 3: Security & Audit).
-- **Voice Synthesis for Inter-Agent Discussions:** Integrating open-source text-to-speech (TTS) models to vocalize meeting room debates and standup summaries.
-- **IDE Extension Integration:** Embedding the 3D office as a live companion webview inside Visual Studio Code and JetBrains IDEs.
-
----
-
-## 19. Open-Source Dependencies / Components
-- **Three.js (`three`):** MIT License — WebGL 3D graphics rendering.
-- **React Three Fiber (`@react-three/fiber`):** MIT License — Declarative React wrapper for Three.js.
-- **Dagre (`@dagrejs/dagre`):** MIT License — Directed graph layout optimization.
-- **Zustand (`zustand`):** MIT License — Lightweight reactive state management.
-- **Framer Motion (`framer-motion`):** MIT License — Physics-based UI animations.
-- **Open-Weight Models:** Qwen 2.5/3.8 (Apache 2.0 / Qwen License), Google Gemma (Gemma Terms), Llama 3.1 / Nemotron (Llama 3.1 Community License), DeepSeek (MIT License).
-
----
-
-## 20. Expected Challenges and Mitigation
-| Identified Challenge | Risk Factor | Proposed Engineering Mitigation |
-| :--- | :--- | :--- |
-| **Provider Rate Limiting (429s)** | High | Token-bucket sliding window with AIMD exponential backoff; automatic role failover across Groq, NVIDIA, and OpenRouter. |
-| **Agent Navigation Collisions** | Medium | Vector separation steering algorithms and discrete doorway queueing systems in `director.ts`. |
-| **Context Window Exhaustion** | High | Three-tier context compaction discipline; automatic memory summarization and physical visual break cycles. |
-| **Hallucinated File Modifications** | High | Git worktree sandboxing with automated validation gates and instant rollback capability before merging. |
-| **WebSocket Reconnection Drops** | Low | Monotonic sequence numbering (`seq`) with `since_seq` client replay protocol guaranteeing zero dropped events. |
-
----
-
-## How to Run the Project
+## 9. Quick Start Guide
 
 ### Prerequisites
-- Node.js 18+ & npm
-- PowerShell 7+ (Windows) or Bash (Linux/macOS)
-- Valid API Keys for at least one provider (Groq, NVIDIA NIM, or OpenRouter)
+- **Node.js** 20.x or higher
+- **npm** 10.x or higher
+- At least one active API key (OpenRouter, Groq, NVIDIA NIM, or local Ollama)
 
-### Setup & Launch
-1. **Configure Environment Variables:**
-   ```powershell
-   # Ensure .env is populated with your keys in the root directory:
-   # GROQ_API_KEY=gsk_...
-   # NVIDIA_API_KEY=nvapi-...
-   # OPENROUTER_API_KEY=sk-or-v1-...
-   ```
-2. **Start the Complete System:**
-   ```powershell
-   # Runs both the Bridge server (:8000) and Frontend (:5173) simultaneously:
-   .\scripts\start-all.ps1
-   ```
-3. **Access the Application:**
-   - 3D Virtual Floor: `http://localhost:5173`
-   - Bridge Health & API: `http://localhost:8000`
+### 1. Clone & Configure
+```bash
+git clone https://github.com/bhalerao-aditya007/RealGravity_slayers.git
+cd RealGravity_slayers
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env and insert your API key:
+# OPENROUTER_API_KEY=sk-or-v1-...
+```
+
+### 2. Install Dependencies
+```bash
+# Install frontend & bridge dependencies
+cd frontend
+npm install
+cd ..
+```
+
+### 3. Launch GravityDesk
+In your first terminal, start the **Mediation Bridge Server**:
+```bash
+cd frontend
+npm run bridge:mock
+# Server starts on http://localhost:8000 (ws://localhost:8000/ws/events)
+```
+
+In your second terminal, launch the **3D Virtual Floor UI**:
+```bash
+cd frontend
+npm run dev
+# Vite dev server opens at http://localhost:5173
+```
+
+Open `http://localhost:5173` in your browser. Choose **Swarm Mode (20 or 50 Agents)**, enter your engineering prompt, and watch the autonomous simulation unfold!
 
 ---
 
-## ⚠️ API Keys & Requirements Disclaimer
+## 10. Verification & Test Suite
 
-GravityDesk operates a real autonomous multi-agent engineering floor with automated model failover.
+The entire GravityDesk codebase is validated with an automated test suite covering kinematics, A* navmesh collisions, event reducers, and WebSocket contract protocols:
 
-### Required API Keys (`.env` in root)
-Create a `.env` file in the root directory with at least one active key (Groq recommended for high-speed code generation):
-
-```ini
-# Primary High-Speed & Reasoning Provider (Free tier supported)
-# Powers: openai/gpt-oss-120b (120B Flagship) & qwen/qwen3.8-27b
-GROQ_API_KEY=gsk_...
-
-# Secondary Cloud Fallback Provider (Free tier models)
-# Powers: nvidia/nemotron-3-super-120b-a12b:free, google/gemma-4-31b-it:free
-OPENROUTER_API_KEY=sk-or-v1-...
-
-# Optional Cloud NIM Provider
-NVIDIA_API_KEY=nvapi-...
-
-# Environment settings
-VITE_USE_MOCK=false
-VITE_API_URL=http://localhost:8000
-PORT=8000
+```bash
+cd frontend
+npm test
 ```
 
-### Rate Limits & Autonomous Model Failover Policy
-- When using free-tier API quotas, per-minute token ceilings (TPM) can be reached during heavy multi-agent code generation.
-- **Auto-Failover**: GravityDesk automatically catches HTTP 429 rate limit responses, applies exponential backoff, and seamlessly rotates between `gpt-oss-120b`, `qwen3.8-27b`, and OpenRouter models in real-time so execution tasks never stall.
+```
+ ✓ src/tests/swarmLayout.test.ts (10 tests) - Ellipse seating, camera angles & bounds
+ ✓ src/tests/nav.test.ts (3 tests) - A* pathfinding & collision avoidance
+ ✓ src/tests/triage.test.ts (10 tests) - Department assignment & complexity rating
+ ✓ src/tests/swarmTape.test.ts (3 tests) - Monotonic sequence reducer & event hydration
+ ✓ src/tests/layout.test.ts (3 tests) - Furniture definitions & chair alignments
+ ✓ src/tests/integration.test.ts (4 tests) - End-to-end multi-agent execution pipeline
+ ✓ src/tests/stress.test.ts (1 test) - Heavy agent movement stress test
+ ✓ src/tests/swarmEntrance.test.ts (2 tests) - 50-agent collision-free entrance & seating
 
-### Local System Requirements
-- **Node.js 18+** & npm.
-- **Python 3.10+** (in system `PATH`) with `pypdf` (`pip install pypdf`) for reading documents/PDF prompts and running automated QA test gates.
-- **Permission Guard**: By default, file reads and disk writes to `D:\GravityDesk\output\` require interactive user approval via the 3D UI. Click **"Always (project)"** to grant permission for the session.
+ Test Files  8 passed (8)
+      Tests  36 passed (36)
+```
 
+---
+
+<p align="center">
+  <b>GravityDesk (BenchMates / RealGravity)</b> · Built with 💜 for the next generation of autonomous engineering.
+</p>
