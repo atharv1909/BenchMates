@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '@/state/store';
 import { Icon, I } from './Icons';
@@ -45,11 +45,30 @@ export function ReportView() {
   const [building, setBuilding] = useState(0);
   const [zipping, setZipping] = useState(false);
 
-  const isCrypto = /crypto|btc|eth|tracker|coin/i.test(goal);
-  const projectName = isCrypto ? 'CRYPTracker' : 'ProjectOutput';
-  const localOutputDir = `D:\\GravityDesk\\output\\${projectName}`;
+  const dirMatch = report?.report_markdown?.match(/\*\*Output Directory:\*\*\s*`([^`]+)`/);
+  const localOutputDir = dirMatch
+    ? dirMatch[1]
+    : (report?.sources?.[0]?.url
+      ? report.sources[0].url.replace(/^file:\/\/\/?/, '').replace(/\/[^/]+$/, '').replace(/\//g, '\\')
+      : 'D:\\GravityDesk\\output\\ProjectOutput');
 
-  const files = useMemo(() => generateProjectFiles(goal), [goal]);
+  const [realFiles, setRealFiles] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    if (!open || !localOutputDir) return;
+    fetch(`http://localhost:8000/api/deliverables?dir=${encodeURIComponent(localOutputDir)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.files && Object.keys(d.files).length > 0) {
+          setRealFiles(d.files);
+          setSelectedFile(Object.keys(d.files)[0]);
+        }
+      })
+      .catch(() => {});
+  }, [open, localOutputDir]);
+
+  const fallbackFiles = useMemo(() => generateProjectFiles(goal), [goal]);
+  const files = realFiles || fallbackFiles;
   const fileKeys = useMemo(() => Object.keys(files), [files]);
 
   if (!open || !report) return null;
